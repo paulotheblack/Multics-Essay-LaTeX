@@ -26,6 +26,9 @@
 % IDC - Incerement address, Decrement tally, and Continue)
 % ITS (pointer) -
 % RCU - Restore Control Unit (ring 0 instruction)
+% Signaller - Module responsivle for procesing faults (master mode procedure)
+% PDS - Process Data Segment
+% Penetrator - 
 
 % # --------------------------------------------------------------------------------- #
 \section{Initial Multics Security Evaluation}
@@ -107,6 +110,10 @@ without detection by the \texti{tsystem maintenance} or \textit{administratiove 
 Several explotations had been discovered, such as changing access fiels in SDW's, changing protected 
 identities in the PDS, inserting trap doors into system libraries and accessing the system password file.
 
+In this essay we are not goint to describe all the vulnerabilities shown by this evaluation, rather just those 
+interesting and with the most significant impact on contemporary development of operating systems and its 
+security's control systems.
+
 \subsection{Hardware Vulnerabilities}
 
 \subsubsection{Subverter routine}
@@ -176,7 +183,7 @@ The vulnerability is as follows:
     \item The second reference through this modifier indirect chain is made by the ring 0 program which proceeds 
     to \textbf{write data where it should not}. 
 \end{itemize}
-% add picture 'Figure 5. Insufficient Argument Validation' .pdf (p) 28
+%# TODO add 'Figure 5. Insufficient Argument Validation' .pdf (p) 28
 
 This vulnerability resulted from violation of a basic rule of the Multics design, that \textit{all arguments to a more 
 privilleged ring must be validated}.
@@ -184,22 +191,99 @@ The problem was no in the fundamental design, but the lack of \textit{ring hardw
 
 \subsubsection{Master Mode Transfer}
 
-% There is one major difficulty in exploiting this vulnerability. 
-% The instruction to which controls is transferred must be 
-% chosen with extreme care. The instructions immediately 
-% following the store must provide some orderly means of 
-% returning control to the malicious user without doing 
-% uncontrolled damage to the system. If a crucial data base is
-% garbled, the system will crash leaving a core dump,  which
-% could incriminate the penetrator.
+The HIS-645 CPU has a \textit{master mode} in which privilleged instructions may be executed and in 
+which \textit{access checking is inhibited} although address translaton through segment and page 
+tables is retained. 
+The original design of Multics protection rings called for master mode code to be restricted to ring 0 by convention.
+This convention caused the \textit{fault handling mechanism} to be excessively expensive due to necessity of switching
+from user ring into ring 0 and out again using the full software ring crossing mechanism.
 
-% The Master Mode Transfer vulnerability
-% resulted from a violation of the fundamental rule that
-% master mode code shall not he executed outside ring 0.
-% The violation was not made maliciously by the system
-% implementors. Rather it occurs because of the interaction
-% of two seemingly independent events:  the ability to
-% transfer via the lp without the system being able to check
-% the validity of the lp setting, and the ability for that
-% transfer to be to master mode code.
+Therefore it was proposed and implemented that the \textit{signaller} module  was permited to run in the user 
+ring to speed up fault processing.
 
+The analysis shows that master mode procedures in the user ring represents a fundamental violation of the Multics 
+security concept. Violating this concept moves the secuirty controls from the basic hardware and software mechanism 
+to the cleverness of the systems programmer who, \textit{being human, makes mistakes and commits oversights}
+The master mode procedures become classical "supervisor calls" with no rules for sufficient security checks.
+
+The master mode \textit{pseudo-operation} code was designed only to protect master mode procedures from random calls 
+within ring 0. It was not designed to withstand the attack of a malicious user. By moving the signaller into the user 
+ring, the designers allowed a user leaving a core dump and therefore to crash the system.
+
+\subsection{Procedural Vulnerabilities}
+
+This section shows the explotation by a remote user online.
+
+\subsubsection{Dump and Patch Utilities}
+
+To provide support to the system maintenance personnel, the Multics system includes commands to \textit{dump} or 
+\textit{patch} any word in the \textbf{entire virtual memory}. These utilities are used to make online repairs while 
+the system continues to run. These commands are dangerous, becuase they \textit{bypass} all security controls to 
+access othersie protected information, and if misused, it can cause crash of the entire system.
+
+To protect the system, these commands are implemented by special privileged \textit{gates} into ring 0. The access control 
+lists on these gates restrict their use to system maintenance personnel by name and authenticated by the login procedure.
+
+Dump and patch utilities would be of a great use to a system penetrator, because they can be used to "do his job". These 
+utilities are prevented from misuse by \textit{ACL} and \textit{audit trial}, but using  \textit{insufficient argument
+validation}, \textit{master mode transfer} and \textit{unlocked stack base} vulnerabilities, these procedural controls 
+may be bypassed and the penetrator can implement his own dump and patch utilities. Can be seen \textbf{DOPLN PYCO}.
+%# TODO add 'Figure 11. Dump/Patch utility using insufficient argument validation' .pdf (p) 45
+
+\subsubsection{Violating The User Identification}
+
+In the need for a protected identification of every user, his ID must be compared with acess control list entries 
+to determine whether a user may access some segment as stated in Security Controls section.
+This identification is established when the user logs into Multics and is authenticated by the password.
+
+The user identification in Multics is stored in a per-process segment called the \textit{process data segment} (PDS).
+PDS resides in ring 0 amd contains many constants used in ring 0 and the ring 0 procedure stack. The PDS must be 
+accessible to any ring 0 procedure within a user's process and must be accessible to ring 4 master master mode 
+procedures such as signaller.
+
+Therefore as stated above section about Dump and Patch utilities vulnerability, these can dump and patch portions of the 
+PDS, thus \textit{forging the non-forgeable user identification}.
+This capability provides the penetrator with an ultimate explotation weapon. The penetrator can undetechably act as any 
+user of the system, including the \textit{system administrator} or \textit{security officer}, immediatelly assuming that 
+user's access privileges.
+
+\subsubsection{Value of the Password File}
+
+The password file is often kept enciphered. A great deal fo effort may be required to invert such a cipher, if the cipher 
+is even invertible at all.
+The password file is generally the most protected file in a computer system. If the penetrator has succeeded in breaking 
+down internal controls to access the password file, he can also \textbf{access every other file in the system}.
+The login path to a system is generally the most carefully audited to attempt to catch \textit{unauthorized} password use.
+The penetrator risks \textit{detection} if he uses an unauthorized password.
+
+So in this point we can assume that accessing the system password file is of minimal value to a penetrator for reasons 
+stated above.
+
+% \subsubsection{Modifying Audit Trials}
+
+% Introduction to audit trials if needed again .pdf 52/53
+
+% Every segment in Multics carries with it audit informa-tion  
+% on  the  date  time  last  used  (DTU)  and  date  time  last  
+% modified (DTM).  These dates are maintained by an audit 
+% mechanism  at  a  very  low  level  in  the  system.
+
+% A  routine  called  set_dates  is  provided  among  the  various
+% subroutine  calls  into  ring  0  which  is  used  when  a  
+% segment  is  retrieved  from  a  backup  tape  to  set  the  
+% seg-ment’s  DTU  and  DTM  to  the  values  at  the  time  the  
+% seg-ment was backed up.  The routine is supposed to be call-able 
+% only from a highly privileged gate into ring 0 that is restricted  
+% to  system  maintenance  personnel.  However,  since  a  penetrator  
+% can  change  his  user  identification,  this  restriction  proves  
+% to  be  no  barrier.    To  access  a  segment  without updating DTU or DTM:
+
+% \begin{enumerate}
+%     \item Change user ID to access segment.
+%     \item Remember old DTU and DTM.
+%     \item Use or modify the segment.
+%     \item Change user ID to system maintenance.
+%     \item --do whatever you want--
+%     \item Reset DTU and DTM to old values.
+%     \item Change user ID back to old value.
+% \end{enumerate}
