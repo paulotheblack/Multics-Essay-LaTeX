@@ -29,6 +29,7 @@
 % Signaller - Module responsivle for procesing faults (master mode procedure)
 % PDS - Process Data Segment
 % Penetrator - 
+% PL/I - 
 
 % # --------------------------------------------------------------------------------- #
 \section{Initial Multics Security Evaluation}
@@ -161,7 +162,7 @@ the \textit{"gatekeeper"} the following information:
 This information is stored by convention in specified locations within the \textit{gate segment}. The gatekeeper 
 invokes an argument validation routine that inspects the argument list being passed to the gate to ensure that the 
 declared requirements are met. If any test fails, the argument validator aborts the call and signals the \textit{"
-gate_error"} in the calling ring.
+gate$_$error"} in the calling ring.
 
 In 1973, a vulnerability was indentified in the argument validator that would permit the \textit{"fooling"} of ring 0 
 programs.
@@ -259,31 +260,71 @@ The penetrator risks \textit{detection} if he uses an unauthorized password.
 So in this point we can assume that accessing the system password file is of minimal value to a penetrator for reasons 
 stated above.
 
-% \subsubsection{Modifying Audit Trials}
+\subsubsection{Modifying Audit Trials}
 
-% Introduction to audit trials if needed again .pdf 52/53
+Audit trails are frequently put into computer systems for the purpose of detecting breaches  of  security. 
+For example, a record of last login time printed when a user logged in could detect the unauthorized 
+use of a user’s password and identification.
 
-% Every segment in Multics carries with it audit informa-tion  
-% on  the  date  time  last  used  (DTU)  and  date  time  last  
-% modified (DTM).  These dates are maintained by an audit 
-% mechanism  at  a  very  low  level  in  the  system.
+Sometimes it is not convenient for the penetrator to bypass an audit, if the audit trial is kept online, 
+it may be easite to allow the audit to take place and then go back and modify the evidence of wrong doing.
 
-% A  routine  called  set_dates  is  provided  among  the  various
-% subroutine  calls  into  ring  0  which  is  used  when  a  
-% segment  is  retrieved  from  a  backup  tape  to  set  the  
-% seg-ment’s  DTU  and  DTM  to  the  values  at  the  time  the  
-% seg-ment was backed up.  The routine is supposed to be call-able 
-% only from a highly privileged gate into ring 0 that is restricted  
-% to  system  maintenance  personnel.  However,  since  a  penetrator  
-% can  change  his  user  identification,  this  restriction  proves  
-% to  be  no  barrier.    To  access  a  segment  without updating DTU or DTM:
+Every segment in Multics carries with it audit infomation on the \textit{Date Time last Used} (DTU) and
+\textit{Date Time last Modified} (DTM). These dates are maintained by an \textit{audit mechanism} at a low 
+level in the system.
 
-% \begin{enumerate}
-%     \item Change user ID to access segment.
-%     \item Remember old DTU and DTM.
-%     \item Use or modify the segment.
-%     \item Change user ID to system maintenance.
-%     \item --do whatever you want--
-%     \item Reset DTU and DTM to old values.
-%     \item Change user ID back to old value.
-% \end{enumerate}
+A routine called "set$_$dates" is provided among the various subroutine calls into ring 0, which is used when 
+a segment is retrieved from a \textit{backup tape} to set the segments DTU and DTM to the values at the time the 
+segment was backed up. This routine is supposed to be callable only by system maintenance personnel (ring 0).
+However, since the penetrator can change his user identification, this restriction proves to be no barrier.
+
+To access a segment penetrator simply:
+\begin{enumerate}
+    \item Change user ID to access segment.
+    \item Remember old DTU and DTM.
+    \item Use or modify the segment.
+    \item Change user ID to system maintenance.
+    \item --do whatever you want--
+    \item Reset DTU and DTM to old values.
+    \item Change user ID back to old value.
+\end{enumerate}
+
+
+\subsubsection{Trap Door Insertion}
+
+In short, trap door is a a feature or defect of a computer system which allows surreptitious unauthorized 
+access to data and system itself. When trap door is inserted, it must be well hiddent to avoid detection by system
+maintenance personnel.
+Trap doors can be inserted in many places:
+\begin{itemize}
+    \item At the facility which the system is produced.
+    \item During the distribution phase. If updates are sent via insecure communications.
+    \item During the installation and operation of the system at user's site.
+\end{itemize}
+
+Trap doos can be easily hidden in changes to the binary code of compiled routine. Such a change can be 
+detected only by comparing bit by bit the object code and the compiler listing. Which can be easily secured 
+by regularly recompile of all modules of the system to eliminate such a trap doors.
+However, if the compiler trap door is inserted to permit object code trap doors to survive even a complete 
+recompilation of entire system. 
+In Multics most of the ring 0 supervisor is written in PL/I. Penetrator could insert trap door in the PL/I and 
+easily delist the desired code to be recompiled.
+Since the PL/I compiler is itself written in PL/I, the trap door can \textit{maintain itself, even if the 
+compiler is recompiled}.
+
+The actual insertion of the trap door was done by following steps:
+\begin{enumerate}
+    \item Change user ID to project SysLib.
+    \item Make patch in the object archive copy of "check\$device\underline{} name" in >ldd>hard>object.
+    \item Reset DTM on object archive.
+    \item Mark patch in bound archive copy of "check\$device\underline{} name" in >ldd>hard>bound\underline{}components.
+    \item Reset DTM on bound archive.
+    \item Reset user ID back to old value.
+\end{enumerate}
+
+%# TODO add 'Figure 13. Trapdoor in check$device_name
+
+\subsection{Conclusion by Schell and Karger}
+
+The primary conclusion one can reach from this analysis is that Multics is \textit{not currently a system} (1973).
+But on the other hand, it is \textbf{significantly more secure} than other commercial systems.
