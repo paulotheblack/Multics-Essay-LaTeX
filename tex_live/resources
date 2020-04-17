@@ -1,0 +1,23 @@
+Multics sim
+[https://multicians.org/simulator.html]
+[http://ringzero.wikidot.com/]
+[https://web.mit.edu/multics-history/source/Multics_Internet_Server/Multics_sources.html]
+* tutorial to run on unix based system
+
+
+Multics features
+[https://multicians.org/features.html]
+
+Virtual memory - tutorial and reflections
+[https://multicians.org/pg/mvm.html]
+
+Networking qoute
+"One of the great unanticipated discoveries of Project MAC was that 
+when more than one person can use a computer at the same time, those people will
+use the computer to communicate with each other." 
+-- Simson Garfinkel, Architects of the Information Society
+
+History:
+Gintell's talk 1989 at ACM
+https://www.youtube.com/watch?v=L8Bay04lCxs
+

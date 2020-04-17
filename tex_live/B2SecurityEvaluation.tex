@@ -1,0 +1,205 @@
+% Based on:
+% Multics Security Evaluation: Vulnerability analysis
+% Paul A. Karger (2nd Lt, USAF)
+% Roger R. Schell (Major, USAF)
+% \href{/data/FIITstu/4_6/PIB/Multics/papers/1974-security-evaluation-volume-2.pdf}
+
+%# TODO Basic questions:
+% Why:
+
+% What:
+
+% How:
+
+% Conclusion:
+
+
+%# TODO Glossary:
+% Encryption device
+% Reference Monitor
+% Subverter
+% Gatekeeper
+% Gate segment
+% WWMCCS GCOS
+% IBM OS/360/370
+% Tiger team
+% IDC - Incerement address, Decrement tally, and Continue)
+% ITS (pointer) -
+% RCU - Restore Control Unit (ring 0 instruction)
+
+% # --------------------------------------------------------------------------------- #
+\section{Initial Multics Security Evaluation}
+% by USAF to get multi-processing multi-user computer system with simultaneous access
+%? to the system by users with different levels of clearances
+%? unclassified -> secret -> top secret
+
+Evaluation of the security of the Multics system had been carried out on the \textit{HIS 645} 
+Multics Systems installed at the \textit{Massachusetts Institute of Technology} and at the 
+\textit{Rome Air Development Center} by:
+\begin{itemize}
+    \item Paul A. Karger (2nd Lt, US Air Force)
+    \item Roger R. Schell (Major, US Air Force)
+\end{itemize}
+in span of March 1972 until June 1973.
+
+The main purpose for this evalution had been the lack of effective \textit{multi-level security controls}
+in US military. The term multi-level (from US Military point of view) means, in the most general case, 
+those controls needed to process several levels of \textit{classified material}, from unclassified 
+through compartmented top secret in a \textit{multi-processing multi-user computer system with simultaneous 
+access} to the system by users with different levels of clearances.
+
+The lack of such effective systems in those days has led the \textit{US Military} to operate computers
+in closed enviroment in which system had been dedicated to the highest level of classified material and
+all users had been required to be cleared to \textit{that} level.
+Such a systems resulted in extreme insufficient manpower utilization and high costs of deployed systems,
+mainly becuase of quantity of dedicated systems. 
+
+Requirements of the \textit{Air Force Data Service Center} (ADFDSC) were to be providen with 
+\textit{responsive interactive time-shared computer services} to users within the Pentagon
+at all \textit{classifcation levels}. From \textit{unclassified} to \textit{top secret} clearence level.
+AFDSC in particular did not wish to incur the expense of \textit{multiple computer systems} nor the expense of 
+\textit{encryption devices} for remote terminals which would otherwise be processing unclassified materials.
+
+\textit{Several more analysis has been done in years after, but this analysis was the key 
+for Multics to gain B2 secuirty evaluation mark.}
+
+
+\subsection{State of "current systems" in early 70's}
+% Operating systems does not considered the security as fundamental requirement
+
+The internal controls of current computers repeatedly have been shown \textit{Insecure} through many
+\textit{penetration exercises} on system such as \textit{GCOS}, \textit{WWMCCS GCOS} and \textit{IBM OS/360/370}.
+This insecurity of internal controls had been fundamental weakness of \textit{these} operating systems 
+and cannot be corrected by \textit{"patches"}, \textit{"fix-ups"} and \textit{"add-ons"} to these systems.
+Rather a \textit{fundamental reimplementation} using an integraded hardware and software design which would 
+consider \textbf{security as fundamental requirement}.
+
+It is not sufficient to use a team of experts to \textit{test} the security controls of a system. Such a 
+\textit{"tiger team"} can only show the existence of vulnerabilities but \textit{cannot} 
+prove their \textit{non-existence}.
+
+\subsection{Reference Monitor}
+
+The concept of \textit{reference monitor} had been introduced by the \textit{ESD Computer Security 
+Technology Panel}. This reference monitor is that hardware and software \textit{combination} which 
+must monitor \textbf{all} references by \textbf{any program} to \textbf{any data anywhere} in the 
+system to ensure that the security rules are followed, which are defined by:
+\begin{itemize}
+    \item The monitor must be tamper proof.
+    % Tamper = to touch or make changes to something that you should not, 
+    % usually without enough knowledge of how it works or when you are trying to damage it
+    \item The monitor must be invoked for every reference to data anywhere in the system
+    \item The monitor must be small enogh to be \textit{proven correct} 
+\end{itemize}
+
+Systems such as GCOS and OS/360 meet just first requirement. The second requirement was generally not met by
+systems contemporary in \textit{60s} and \textit{70s}, since they usually include \textit{bypasses} to permit
+special software top operate.
+The most imporatant, operating systems in those days had been so \textit{large}, so \textit{complex} and 
+so \textit{monolithic} that one could not begin to attempt a formal proof or cetification of their current 
+implementation. 
+
+\subsection{Approach Plan}
+
+An attempt was to be made to operate with same type of ground rules under which a real agent would operate.
+That is, with each penetration, and attempt would be made to extract or modify sensitive system data 
+without detection by the \texti{tsystem maintenance} or \textit{administratiove personnel}.
+Several explotations had been discovered, such as changing access fiels in SDW's, changing protected 
+identities in the PDS, inserting trap doors into system libraries and accessing the system password file.
+
+\subsection{Hardware Vulnerabilities}
+
+\subsubsection{Subverter routine}
+
+To attempt a gross measure of the rate of security sensitive component failure, a procedure called the 
+\textit{subverter} was written to sample the security sensitive hardware on frequent basis, testing for 
+component failures which could compromise the security controls.
+The subverter was run in the background of an interactive process, once each minute. The subverter was run 
+over 1100 hours in a year period on the \textit{MIT 645 System}, during these operating hours no security sensitive 
+component failures were detected.
+Which points at and gave great result about the concert in a system processing multi-level classified material.
+If the hardware is prone to error, potentional security vulnerabilities become a significant problem.
+
+\subsubsection{Instruction Access Check Bypass}
+
+While experimenting with the hardware subverter, a sequence of code was observed which would cause the hardware 
+of the 645 to \textit{bypass access checking}. Specifically the \textit{execute} instruction in certain cases 
+would permit the executed instruction to access a segment for \textit{reading} or \textit{writing} without the 
+corresponding permissions in the SDW.
+This vulnerability occurred when the execute instruction was in certain restricted locations of a segment with 
+at least \textit{read-execute} permission.
+The exact layout of instructions and indirect words was crucial, otherwise the \textit{access checks} were done 
+properly.
+This bug represents a violation of one of the most fundamental rules of the Multics design concept - the checking 
+of \textbf{every} reference to a segment by the hardware.
+
+\subsection{Software Vulnerabilities}
+
+\subsubsection{Insufficint Argument Validation}
+
+Becuase the 645 Multics system must simulate \textit{protection rings} in software, there is no direct hardware 
+validation of arguments passed in a subroutine call from a \textit{less privilleged ring} to \textit{more 
+privilleged ring}. Some form of validation is required, because a malicious user could call a ring 0 routine 
+that stores information through a user supplied pointer.
+If the malicious user supplied a pointer to data to which ring 0 had \textit{write} permission but to which the 
+user ring did not, ring 0 could be \textit{"tricked"} into causeing a security violation.
+
+To provide validation, the 645 \textit{software ring crossing mechanism} requires all gate segments to declare to 
+the \textit{"gatekeeper"} the following information:
+\begin{enumerate}
+    \item number of arguments expected
+    \item data type of each arguments
+    \item access requirements for each argument - read only or read/write
+\end{enumerate} 
+This information is stored by convention in specified locations within the \textit{gate segment}. The gatekeeper 
+invokes an argument validation routine that inspects the argument list being passed to the gate to ensure that the 
+declared requirements are met. If any test fails, the argument validator aborts the call and signals the \textit{"
+gate_error"} in the calling ring.
+
+In 1973, a vulnerability was indentified in the argument validator that would permit the \textit{"fooling"} of ring 0 
+programs.
+The argument validator's algorithm to validate read or read/write permission was as this:
+\begin{enumerate}
+    \item Copy the argument list into ring 0 to prevent modification of the argument list by a process 
+    running on another CPU in the system while the first process is in ring 0 and has completed argument validation
+    \item Force indirection through each argument pointer to obtain the segment number of the target argument
+    \item Look up the segment in the calling ring's descriptor segment to check for read or write permission
+\end{enumerate}
+
+The vulnerability is as follows:
+\begin{itemize}
+    \item An argument pointer supplied by the user is constructed to contain an IDC modfier that causes the first 
+    reference through the indirect chain to address a valid argument.
+    \item The first reference is the one made by the argument validator.
+    \item The reference through the IDC modifier increments the address field of the tally word causing it to point 
+    to a different ITS pointer which points to an argument which is writable in ring 0 \textbf{only}.
+    \item The second reference through this modifier indirect chain is made by the ring 0 program which proceeds 
+    to \textbf{write data where it should not}. 
+\end{itemize}
+% add picture 'Figure 5. Insufficient Argument Validation' .pdf (p) 28
+
+This vulnerability resulted from violation of a basic rule of the Multics design, that \textit{all arguments to a more 
+privilleged ring must be validated}.
+The problem was no in the fundamental design, but the lack of \textit{ring hardware} on HIS-645 CPU system.
+
+\subsubsection{Master Mode Transfer}
+
+% There is one major difficulty in exploiting this vulnerability. 
+% The instruction to which controls is transferred must be 
+% chosen with extreme care. The instructions immediately 
+% following the store must provide some orderly means of 
+% returning control to the malicious user without doing 
+% uncontrolled damage to the system. If a crucial data base is
+% garbled, the system will crash leaving a core dump,  which
+% could incriminate the penetrator.
+
+% The Master Mode Transfer vulnerability
+% resulted from a violation of the fundamental rule that
+% master mode code shall not he executed outside ring 0.
+% The violation was not made maliciously by the system
+% implementors. Rather it occurs because of the interaction
+% of two seemingly independent events:  the ability to
+% transfer via the lp without the system being able to check
+% the validity of the lp setting, and the ability for that
+% transfer to be to master mode code.
+

@@ -1,0 +1,120 @@
+% Based on:
+% [1] Multics Security Evaluation: Vulnerability analysis II
+% Paul A. Karger (2nd Lt, USAF)
+% and
+% Roger R. Schell (Major, USAF)
+% \href{/data/FIITstu/4_6/PIB/Multics/papers/1974-security-evaluation-volume-2.pdf}
+
+% [2] ...
+
+
+%# TODO Basic questions:
+% Why:
+
+% What:
+
+% How:
+
+% Conclusion:
+
+%# TODO Glossary:
+
+
+% # --------------------------------------------------------------------------------- #
+
+
+\section{Security Controls}
+
+\textbf{The basic security controls of Multics fall into three areas:}
+
+\subsection{Hardware Security Controls}
+
+\subsubsection{Segmentation Hardware}
+
+Also viewed as the most \textit{fundamental} security controls in the HIS 645.
+# TODO segmentation && master mode dopisat
+
+\subsection{Software Security Controls}
+
+\subsubsection{Protection Rings} 
+# TODO spomenut, ze uz len par-krat v historii boli implementovane
+#? vcelku unikat
+
+The primary software security control on 645 Multics system had been called \textit{The ring mechanism}.
+Originally had been proposed as extension for the more traditional \textit{master and slave mode}.
+The protection rigns had been numbered from 0 to 7, and definied in the way:
+
+\textit{The higher numbered rings having less privilege than lower numbered rings, and ring 0
+containing 'hardcore' supervisor}. On the 645 CPU rings mechanism have not been implemented in the way of hardware.
+(Only after several years on HIS 6180 CPU.) Therefore, the protection rings have been implemented by providing 
+\textit{eight descriptor segments} for each user, one descriptior segment per ring.
+
+# TODO protection rings doplnit info z inej literatury
+
+<- prerobit cas, pisat v pritomnom case o HW & SW rieseniach
+---------------
+
+\subsubsection{Access Control Lists}
+# TODO priame prebratie UNIX-om (kopirant Thompson)
+
+Segments in Multics are stored in a hierarchy of directories. \textit{Directory} is a special type of of
+segment that is not directly accessible to the(all) users.
+Directory stores names and other information about undelying segments and directories.
+Each segment and directory has an \textit{Access control list} (ACL) in its parent directory entry
+\textit{who} may \textit{read}, \textit{write} or \textit{execute} (also known as 'r-w-x') the segment or obtain 
+\textit{status} of, \textit{modify} entries line or \textit{append} entries on directory (also known as 's-m-a').
+
+In order to acces file/directory, the ring 0 software compares the ID of user with access control list entries.
+(User indentification is established when user sings on to the Multics and it os stored in the Process Data 
+Segment (PDS), whish is accessible only in ring 0 or in Master mode - \textit{so that user cannot modify the
+process data segment} and grant acces anywhere on the system.)
+
+\subsubsection{Master Mode}
+# TODO prirovnat k superuser
+
+The convention around protecting \textit{master mode software}, was specified as the master mode procedures
+were not to be used outside ring 0. (Becauase of endless and penetrable checking of input arguments).
+Convention had been definied as of "\textit{each master mode procedure must have a master mode pseudo-operation
+ code assembled into location 0}".
+
+ The master mode pseudo-operation generates code to test an index register for a value corresponding to an 
+ entry point in the segment. If the index register is invalid, the master mode pseudo-operation saves the
+ registers for debugging and shuts the system down.
+
+ 
+ \subsection{Procedural Security Controls}
+
+ \subsubsection{Enciphered passwords}
+# TODO neskor porovnaj, ze v tejto dobe je to rovnake (len vyuzite nove algols) no ludia to beztak zanedbavaju
+
+As a primary authentication method (since the brink of computers until these days) during login sequence 
+is password.
+
+When user types a password it is \textit{enciphered} and compared with the stored encpithered version for validity.
+All passwords on systetem are stored in non-invertible cipher form, which also acts as additional security in case 
+of system dump. Plain text passwords are stored nowhere on the system.
+
+\subsubsection{Login Audit}
+# TODO prirovnat -> prihlasenie na server totozne hlasenie
+
+Each login and logout is carefully audited to check for attempts to guess a valid password for a certain user.
+In addition each user is informed of the \textit{date}, \textit{time} and \textit{terminal identification} of last
+login to detect past compromises of the users \textit{access rights}.
+Also as addition, the user is told the number of times his password has been given incorrectly since its 
+last correct use. 
+
+\subsubsection{Software Maintenancee Procedures}
+# TODO prirovnat k sucasnemu fungovaniu package managers
+
+The maintenance of the \textit{Multics software} had been carried out textbf{online} on a \textit{dial-up 
+Multics facility}. A programmer prepared (and debugs) his software for installation, then submits his
+software to a \textit{library installer} who copied and recompiled the source code in a \textit{protected 
+directory}. 
+The software prior installing into the system source and object libraries had been checked by library installer.
+
+Ring 0 software is stored on a \textit{system tape} that is reloaded into the system each time it is brought up.
+(New system tapes are generated from online copies of the ring 0 software).
+
+The system libraries had been protected against modification by access control list mechanism. In addition 
+the library installers had been periodically checked of last modification of all segments in the library to
+detect unathorized modifications.
