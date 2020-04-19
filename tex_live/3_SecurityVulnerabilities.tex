@@ -2,40 +2,48 @@
 % Multics Security Evaluation: Vulnerability analysis
 % Paul A. Karger (2nd Lt, USAF)
 % Roger R. Schell (Major, USAF)
-% \href{/data/FIITstu/4_6/PIB/Multics/papers/1974-security-evaluation-volume-2.pdf}
-
-%# TODO add Reference! "All this is based on ..."
-% Why:
-
-% What:
-
-% How:
-
-% Conclusion:
 
 
-%# TODO Glossary:
-% Encryption device
-% Reference Monitor
-% Subverter
-% Gatekeeper
-% Gate segment
-% WWMCCS GCOS
-% IBM OS/360/370
-% Tiger team
-% IDC - Incerement address, Decrement tally, and Continue)
-% ITS (pointer) -
-% RCU - Restore Control Unit (ring 0 instruction)
-% Signaller - Module responsivle for procesing faults (master mode procedure)
-% PDS - Process Data Segment
-% Penetrator - 
-% PL/I - 
 
 % # --------------------------------------------------------------------------------- #
-\section{Initial Multics Security Evaluation}
+\section{Running Multics nowadays}
+
+Creating a Multics system or machine nowadays is a bit sketchy process. Since Multics is reling on designated hardware 
+such as HIS-645 or 6180 processors (developed by Honeywell) it is not an easy task to do.
+You can not simply create \textit{Virtual Machine} from from disk image (ISO). But there are still some options how to do it, 
+you can use \textit{simulator/emulator} for such a task. 
+
+MIT in cooperation with BULL runs \href[Multics Internet Server]{https://web.mit.edu/multics-history/source/Multics_Internet_Server/Multics_sources.html}
+containing edition of Multics software and documentation, which is useful if you want to try PL/I and rest locally.
+
+
+\subsection{DPS8-Simulator}
+
+I came accross project which still maintain love and desire for running Multics system.
+\textbf{RingZero - Multics Reborn} project, created by \textit{Harry Reed} and \textit{Charles Anthony} which is available for 
+public \href[download]{http://ringzero.wikidot.com/}. Development takes place on \href[GitLab]{https://gitlab.com/dps8m/dps8m}. 
+They provide \textit{DPS8-M simulator}. Still with no much capabilities, but as stated milestone from 11. August 2014:
+\textit{Multics reborn! The dps-8/m SIMH-based simulator booted Multics MR 12.5, came to operator command level, entered 
+admin mode, created a small PL/I program, compiled and executed it, and shut down.} PRIDAJ REFERENCIU[ring zeo]
+
+
+SEM DAJ NAVOD AKO TO ROZBEHAT U SEBA
+
+stiahnut dps8m
+stiahnut quickstart 
+setup http://multics-wiki.swenson.org/index.php/Getting_Started
+using http://multics-wiki.swenson.org/index.php/Using_Multics#More_Processing
+%# TODO pridaj do ref.
+
+
+
+\section{Multics Security Evaluation by USAF}
 % by USAF to get multi-processing multi-user computer system with simultaneous access
 %? to the system by users with different levels of clearances
 %? unclassified -> secret -> top secret
+
+Since on DPS8-M simulator you can not really breach security controls. I will describe in short the most knonwn evaluation of 
+Multics system and how they were able to exploit vulnerabilities in system. Referencing to paper [PRIDAJ REFERENCIU]
 
 Evaluation of the security of the Multics system had been carried out on the \textit{HIS 645} 
 Multics Systems installed at the \textit{Massachusetts Institute of Technology} and at the 
@@ -145,6 +153,9 @@ of \textbf{every} reference to a segment by the hardware.
 
 \subsubsection{Insufficint Argument Validation}
 
+On the 645 CPU rings mechanism have not been implemented in the way of hardware. (Only after several years on HIS 6180 CPU.) 
+Therefore, the protection rings have been implemented by providing \textit{eight descriptor segments} for each user, one 
+descriptor segment per ring.
 Becuase the 645 Multics system must simulate \textit{protection rings} in software, there is no direct hardware 
 validation of arguments passed in a subroutine call from a \textit{less privilleged ring} to \textit{more 
 privilleged ring}. Some form of validation is required, because a malicious user could call a ring 0 routine 
@@ -265,10 +276,8 @@ stated above.
 Audit trails are frequently put into computer systems for the purpose of detecting breaches  of  security. 
 For example, a record of last login time printed when a user logged in could detect the unauthorized 
 use of a user’s password and identification.
-
 Sometimes it is not convenient for the penetrator to bypass an audit, if the audit trial is kept online, 
 it may be easite to allow the audit to take place and then go back and modify the evidence of wrong doing.
-
 Every segment in Multics carries with it audit infomation on the \textit{Date Time last Used} (DTU) and
 \textit{Date Time last Modified} (DTM). These dates are maintained by an \textit{audit mechanism} at a low 
 level in the system.
@@ -326,12 +335,6 @@ The actual insertion of the trap door was done by following steps:
 
 \subsection{Conclusion by Schell and Karger}
 
-The primary conclusion one can reach from this analysis is that Multics is \textit{not currently a system} (1973).
-But on the other hand, it is \textbf{significantly more secure} than other commercial systems.
+The primary conclusion one can reach from this analysis is that Multics is \textit{not currently a secure system} (1973).
+But on the other hand, it is \textbf{significantly more secure} than any other system.
 
-
-
-%# TODO check appendixes for some funny procedures for PKS guys
-%
-%
-%

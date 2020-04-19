@@ -20,10 +20,7 @@
 % Conclusion:
 
 %# TODO Glossary:
-% System designer
-% Access
-% Administator
-% Bottleneck
+
 
 % # --------------------------------------------------------------------------------- #
 
@@ -73,117 +70,126 @@
 
 \section{Security Controls}
 
+
 \subsection{Access Control List}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\textbf{The basic security controls of Multics fall into three areas:}
-
-\subsection{Hardware Security Controls}
-
-\subsubsection{Segmentation Hardware}
-
-Also viewed as the most \textit{fundamental} security controls in the HIS 645.
-% # TODO segmentation && master mode dopisat
-
-\subsection{Software Security Controls}
-
-\subsubsection{Protection Rings} 
-% # TODO spomenut, ze uz len par-krat v historii boli implementovane
-% #? vcelku unikat
-
-The primary software security control on 645 Multics system had been called \textit{The ring mechanism}.
-Originally had been proposed as extension for the more traditional \textit{master and slave mode}.
-The protection rigns had been numbered from 0 to 7, and definied in the way:
-
-\textit{The higher numbered rings having less privilege than lower numbered rings, and ring 0
-containing 'hardcore' supervisor}. On the 645 CPU rings mechanism have not been implemented in the way of hardware.
-(Only after several years on HIS 6180 CPU.) Therefore, the protection rings have been implemented by providing 
-\textit{eight descriptor segments} for each user, one descriptior segment per ring.
-
-% # TODO protection rings doplnit info z inej literatury
-
-
-\subsubsection{Access Control Lists}
-% # TODO priame prebratie UNIX-om (kopirant Thompson)
-
-Segments in Multics are stored in a hierarchy of directories. \textit{Directory} is a special type of of
-segment that is not directly accessible to the(all) users.
+The central fixture of Multics is an organized information storage system which provides reliability and 
+protection from unathorized information release. All use of information in the storage system is implemented 
+bymapping the informationinto the virtual memory of some process. Storage is logically organized in separately 
+named data storage segments, each whoch contains up to 262144 36-bit words. A segment is the cataloguing unit of 
+the storage system.
+Segments in Multics are stored in a hierarchy of director(Becauase of endless and penetrable checking of input arguments).ies. \textit{Directory} is a special type of of
+segment that is not directly accessible to the users.
 Directory stores names and other information about undelying segments and directories.
 Each segment and directory has an \textit{Access control list} (ACL) in its parent directory entry
 \textit{who} may \textit{read}, \textit{write} or \textit{execute} (also known as 'r-w-x') the segment or obtain 
 \textit{status} of, \textit{modify} entries line or \textit{append} entries on directory (also known as 's-m-a').
+The ACL consits of three partitions:
+\begin{enumerate}
+    \item Every individual user of system in a separate access control group by himself whith his \textit{perosnal name}.
+    \item Sets of users in groups who cooperate in some activity, called \textit{projects}. One person may be a member of 
+    several projects.
+    \item  The third partition allows an individual user to create his own, named protection compartments (directories).
+\end{enumerate}
 
-In order to acces file/directory, the ring 0 software compares the ID of user with access control list entries.
-(User indentification is established when user sings on to the Multics and it os stored in the Process Data 
+For example:
+User Mike in Project Compiler has all rights to read-write-execute
+\begin{lstlisting}
+    Mike.Compiler.x     (rwx)
+\end{lstlisting}
+
+Also \textit{asterix (*)} to grant access to \textit{all}.
+User Mike in all associated project, thus directories has read-write privilege.
+\begin{lstlisting}
+    Mike.*.*            (rw)
+\end{lstlisting}
+In order to acces file/directory, the ring 0 (rings mechanism is in greater details described in section cislo.cislo) 
+software compares the ID of user with access control list entries.
+User indentification is established when user sings on to the Multics and it os stored in the Process Data 
 Segment (PDS), whish is accessible only in ring 0 or in Master mode - \textit{so that user cannot modify the
-process data segment} and grant acces anywhere on the system.)
+process data segment} and grant acces anywhere on the system.
+
+
+\subsection{Authentication of users}
+
+Whole process of access control lists, access modes, protected subsystems and hierarcical control depends on an 
+acurate principal identifier being associated with every process. Accuracy of the identification depens on 
+authentication of the user's claimed identity.
+Every user is \textit{registred} with \textit{unique name} (convention: last name, plus one or two initials) 
+associated with a \textit{password} of up to eight ASCII characters. Also as another measurement, the user may 
+(after authenticating) change his password at any time.
+
+When user types a password it is \textit{enciphered} and compared with the stored encpiphered version for validity.
+All passwords on systetem are stored in non-invertible cipher (one-way encryption) form, which also acts as additional 
+security in case of system dump. Plain text passwords are stored \textit{nowhere} on the system. As a result, passwords 
+are not routinely know by any system administrator or project administators.
+Additional feature of Multics system password mechanism is that, when user is requested to give his password, the printer 
+on his terminal is \textit{turned off}.(Becauase of endless and penetrable checking of input arguments).
+
+
+Each login and logout is carefully audited to check for attempts to guess a valid password for a certain user. 
+If a user provides incorrect password, the event of an \textit{incorrect login attempt} is noted in \textit{
+threat-monitoring log}, and user is permited to try again, up to ten-times at which point the telephone or network 
+connection is broken by the system.
+In addition each user is informed of the \textit{date}, \textit{time} and \textit{terminal identification} of last
+login to detect past compromises of the users \textit{access rights}, also user is told the number of times his password 
+has been given incorrectly since its last correct use in his greeting message. 
+
+
+\subsection{Primary Memory Protection}
+
+The virtual address space of a Multics process is implemented with an \textit{array of descriptors}, calld 
+a \textit{descriptor segment}. Every reference to the virtual memory specifies both, segment number (index) and a 
+word number within the segment.
+The reason why the proctection information is associated with the addressing descriptor rather than data itself is, 
+in \textit{multiprocessor system} such as Multics, two same processes may be executing at a same time, so single 
+protection specification associated with the data is not sufficient.
+
+%TODO add 'Figure 1. -- Multics descriptor' MIT-LCS.pdf (p) 75
+
+\begin{enumerate}
+    \item Physical address and size of the segment based on this descriptor.
+    \item Bits separately controlling persmission (read-write-exectute).
+    \item Control of permission to enter a protected subsystem which has entry points in the segment.
+    \item Controls on which protected subsystems may use this descriptor.
+\end{enumerate}
+
+Another feature of the descriptors used in Multics is implemented inside the \textit{second} and \textit{third} part of descriptor, 
+which can be seen on \textbf{Figure no. zatial neznam pridaj}, together they allow hardware enforcement of protected subsystems, 
+which are intended to be used only by calls to \textit{desiganted entry points}, know as \textit{gates}. As a result of this, 
+it is possible to construct proprietary programs whoch cannot be read. They return only statistics rather than raw data.
+
+\textit{Protected subsystems} are formed by using the \textit{third field} of the descriptor extension. Multics force a 
+\textit{hierarchical} constraint on all subsystems within a single process. Each subsystem is assigned a number between 
+\textbf{0} and \textbf{7}. This scheme is also called \textit{the ring mechanism} or \textit{the rings of protection}. 
+The protection rigns are definied in the way:
+\textit{The higher numbered rings having less privilege than lower numbered rings, and ring 0
+containing 'hardcore' supervisor}. Therefore, each subsystem is permited to use all of those descriptors containing 
+protected subsystem numbers greater or equal to its own.
+
+The descriptors are adjusted to provide \textit{only} the amount of access required by the \textit{supervisor} in direct 
+harmony of \textit{Design principal number 6}. These mechanism do not prohiibit the supervisor from making full use of hardware, 
+rather han protection against accidental/exploitation overuse of supervisor privileges.
 
 \subsubsection{Master Mode}
-% # TODO prirovnat k superuser
 
 The convention around protecting \textit{master mode software}, was specified as the master mode procedures
-were not to be used outside ring 0. (Becauase of endless and penetrable checking of input arguments).
-Convention had been definied as of "\textit{each master mode procedure must have a master mode pseudo-operation
- code assembled into location 0}".
+were not to be used outside ring 0. Convention had been definied as of "\textit{each master mode procedure must 
+have a master mode pseudo-operation code assembled into location 0}".
+The master mode pseudo-operation generates code to test an index register for a value corresponding to an 
+entry point in the segment. If the index register is invalid, the master mode pseudo-operation saves the
+registers for debugging and shuts the system down.
 
- The master mode pseudo-operation generates code to test an index register for a value corresponding to an 
- entry point in the segment. If the index register is invalid, the master mode pseudo-operation saves the
- registers for debugging and shuts the system down.
+\subsubsection{Software Maintenancee Procedure}
 
- 
- \subsection{Procedural Security Controls}
-
- \subsubsection{Enciphered passwords}
-% # TODO neskor porovnaj, ze v tejto dobe je to rovnake (len vyuzite nove algols) no ludia to beztak zanedbavaju
-
-As a primary authentication method (since the brink of computers until these days) during login sequence 
-is password.
-
-When user types a password it is \textit{enciphered} and compared with the stored encpithered version for validity.
-All passwords on systetem are stored in non-invertible cipher form, which also acts as additional security in case 
-of system dump. Plain text passwords are stored nowhere on the system.
-
-\subsubsection{Login Audit}
-% # TODO prirovnat -> prihlasenie na server totozne hlasenie
-
-Each login and logout is carefully audited to check for attempts to guess a valid password for a certain user.
-In addition each user is informed of the \textit{date}, \textit{time} and \textit{terminal identification} of last
-login to detect past compromises of the users \textit{access rights}.
-Also as addition, the user is told the number of times his password has been given incorrectly since its 
-last correct use. 
-
-\subsubsection{Software Maintenancee Procedures}
-% # TODO prirovnat k sucasnemu fungovaniu package managers
-
-The maintenance of the \textit{Multics software} had been carried out textbf{online} on a \textit{dial-up 
+The system is initialized from a magnetic tape which contains copies of every program residing in the \textit{most protected 
+area}. The maintenance of the \textit{Multics software} had been carried out \textbf{online} on a \textit{dial-up 
 Multics facility}. A programmer prepared (and debugs) his software for installation, then submits his
 software to a \textit{library installer} who copied and recompiled the source code in a \textit{protected 
 directory}. 
-The software prior installing into the system source and object libraries had been checked by library installer.
-
+The software prior installing into the system source and object libraries is checked by library installer.
 Ring 0 software is stored on a \textit{system tape} that is reloaded into the system each time it is brought up.
 (New system tapes are generated from online copies of the ring 0 software).
-
 The system libraries had been protected against modification by access control list mechanism. In addition 
 the library installers had been periodically checked of last modification of all segments in the library to
 detect unathorized modifications.
