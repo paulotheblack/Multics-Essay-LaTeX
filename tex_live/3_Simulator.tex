@@ -1,0 +1,214 @@
+% Based on:
+% setup http://multics-wiki.swenson.org/index.php/Getting_Started
+% using http://multics-wiki.swenson.org/index.php/Using_Multics#More_Processing
+%
+% # --------------------------------------------------------------------------------- #
+
+\section{Running Multics nowadays}
+
+Creating a Multics system or machine nowadays is a bit sketchy process. Since Multics is relying on designated hardware 
+such as HIS-645 or 6180 processors (developed by Honeywell) it is not an easy task to do.
+You can not simply create \textit{Virtual Machine} from from disk image (ISO). But there are still some options how to do it, 
+you can use \textit{simulator/emulator} for such a task. 
+
+MIT in cooperation with BULL runs \href{https://web.mit.edu/multics-history/source/Multics_Internet_Server/Multics_sources.html}{Multics Internet Server} \cite{mitBull}
+containing edition of Multics software and documentation, which is useful if you want to try PL/I and rest locally.
+
+
+\subsection{DPS8-Simulator}
+
+I came across project which still maintain love and desire for running Multics system.
+\textbf{RingZero - Multics Reborn} \cite{ringzero} project, created by \textit{Harry Reed} and \textit{Charles Anthony} which is available for 
+public \href{http://ringzero.wikidot.com/}{download}. Development takes place on \href{https://gitlab.com/dps8m/dps8m}{GitLab}. 
+They provide \textit{DPS8-M simulator}. Still with no much capabilities, but as stated milestone from 11. August 2014:
+
+\begin{displayquote}
+\textit{Multics reborn! The dps-8/m SIMH-based simulator booted Multics MR 12.5, came to operator command level, entered 
+admin mode, created a small PL/I program, compiled and executed it, and shut down.} \cite{ringzero}
+\end{displayquote}
+
+\subsection{How to run Multics on GNU\textbackslash Linux}
+
+Detailed process can be found \href{http://multics-wiki.swenson.org/index.php/Main_Page}{Swenson's Multics Wiki} \cite{setupRingZero}
+
+\begin{enumerate}
+    \item \href{http://ringzero.wikidot.com/r2-0-load-and-go}{Download} \textit{Pre-built executable} (so we do not need to build simulator from source).
+    \item \href{https://s3.amazonaws.com/eswenson-multics/public/releases/MR12.6f/QuickStart_MR12.6f.zip}{Download} "QuickStar RLV", which provides and already Multics system disk image that is ready to run.
+    \item Unzip both archives and put in the same directory in system. Go to directory in terminal and:
+\end{enumerate}
+
+\begin{lstlisting}
+$> ./dps8 MR12.6f_boot.ini 
+
+DPS8/M emulator (git 2a56f38d)
+Production build
+#### M_SHARED BUILD ####
+System state restored
+Please register your system at https://ringzero.wikidot.com/wiki:register
+or create the file 'serial.txt' containing the line 'sn: 0'.
+FNP telnet server port set to 6180
+
+DPS8/M simulator V4.0-0 Beta        git commit id: c420925a
+TAPE: unit is read only
+MR12.6f_boot.ini-30> set opcon config=attn_hack=1
+Non-existent device
+[FNP emulation: listening to 127.0.0.1 6180]
+CONSOLE: ALERT
+bootload_0: Booting system MR12.6f generated 01/09/17 1119.1 pst Mon.   
+1500.2  announce_chwm: 428. pages used of 512. in wired environment.
+1500.2  announce_chwm: 706. words used of 1024. in int_unpaged_page_tables.
+find_rpv_subsystem: Enter RPV data: M-> [auto-input] rpv a11 ipc 3381 0a
+
+1500.2  load_mst: 946. out of 1048. pages used in disk mst area.
+bce (early) 1500.2: M-> [auto-input] bce
+
+Multics Y2K.  System was last shudown/ESD at:
+Saturday, April 1, 2017 20:37:12 pst
+Current system time is: Sunday, April 19, 2020 7:00:16 pst.
+Is this correct? M-> [auto-input] yes
+
+The current time is more than the supplied boot_delta hours beyond the
+unmounted time recorded in the RPV label.  Is this correct? M-> [auto-input] yes
+
+The current time I'm using is more than 12 hours
+after the last shutdown time recorded in the RPV label.
+Are you sure this is correct? M-> [auto-input] yes
+
+bce (boot) 0700.2: M-> [auto-input] boot star
+
+Multics MR12.6f - 04/19/20  0700.4 pst Sun
+0700.4  Loading FNP d, >user_dir_dir>SysAdmin>a>mcs.7.6c>site_mcs 7.6c
+Received BOOTLOAD command...
+0700.4  FNP d loaded successfully
+
+
+Volumes to be Scavenged:
+
+rpv    (root)
+root2  (root)
+root3  (root)
+
+Ready
+0700  as   as_init_: Multics MR12.6f; Answering Service 17.0
+0700  as   LOGIN              IO.SysDaemon dmn cord (create)
+0700  as   LOGIN              Backup.SysDaemon dmn bk (create)
+0700  as   LOGIN              IO.SysDaemon dmn prta (create)
+0700  as   LOGIN              Utility.SysDaemon dmn ut (create)
+0700  as   LOGIN              Volume_Dumper.Daemon dmn vinc (create)
+0700  as   LOGIN              Scavenger.SysDaemon dmn scav1 (create)
+0700  as   as_mcs_mpx_: Load signalled for FNP d.
+0700  bk   
+0700  cord Enter command:  coordinator, driver, or logout:
+-->  cord
+0700  bk   r 07:00 0.194 30
+0700  bk   
+-->  bk
+0700  prta Enter command:  coordinator, driver, or logout:
+-->  prta
+0700  ut   copy_dump: Attempt to re-copy an invalid dump.
+0700  ut   delete_old_pdds: Some directory or segment in the pathname is not listed in the VTOC. Unable to salvage >pdd.!BBBKPBBzF
+0700  ut   jWCfq. Will attempt to delete it.
+0700  ut   delete_old_pdds: Some directory or segment in the pathname is not listed in the VTOC. Unable to salvage >sl1.!BBBKPBBzF
+0700  ut   jWCfq. Will attempt to delete it.
+0700  vinc 
+0700  vinc r 07:00 0.197 25
+0700  vinc 
+-->  vinc
+0700  scav1 Created >system_control_1>scav1.message
+0700.5  scavenger: Begin scavenge of dska_00a by Scavenger.SysDaemon.z
+0700  scav1 Scavenging volume rpv of logical volume root
+0700  as   sc_admin_command_: Utility.SysDaemon.z: delete_old_pdds
+0700  ut   send_admin_command: Execution started ... 
+0700.7  vtoce_stock_man: Attempt to deposit free vtocx 4037 on dska_00
+0700.7  vtoce_stock_man: Attempt to deposit free vtocx 4036 on dska_00
+0700  ut   completed.
+0700.7  scavenger: Scavenge of dska_00a by Scavenger.SysDaemon.z completed.
+0700.7  scavenger: Begin scavenge of dska_00b by Scavenger.SysDaemon.z
+0700  scav1 Scavenging volume root2 of logical volume root
+0700  ut   monitor_quota: The requested action was not performed. 
+0700  ut   The quota of >dumps is 0, a record limit needs to be specified.
+0700.7  RCP: Attached tapa_00 for Utility.SysDaemon.z
+0700  ut   
+0700  ut   Records   Left  %    VTOCEs   Left  %   PB/PD  LV Name
+0700  ut   
+0700  ut   166172   99180  60   42218   33972  80  pb     root
+0700  ut   
+0700  ut   r 07:00 0.505 477
+0700  ut   
+-->  ut
+0700.7  RCP: Detached tapa_00 from Utility.SysDaemon.z
+0700.7  RCP: Attached rdra for Utility.SysDaemon.z
+0700.7  RCP: Detached rdra from Utility.SysDaemon.z
+0700.7  RCP: Attached puna for Utility.SysDaemon.z
+0700.7  RCP: Detached puna from Utility.SysDaemon.z
+0700.7  RCP: Attached prta for Utility.SysDaemon.z
+0700.7  RCP: Detached prta from Utility.SysDaemon.z
+0700.9  scavenger: Scavenge of dska_00b by Scavenger.SysDaemon.z completed.
+0700  scav1 Scavenging volume root3 of logical volume root
+0700.9  scavenger: Begin scavenge of dska_00c by Scavenger.SysDaemon.z
+0701.1  scavenger: Scavenge of dska_00c by Scavenger.SysDaemon.z completed.
+\end{lstlisting}
+
+Your Multics system is up and running. The terminal shell in which you started the simulator and Multics is now the operator console.
+
+
+The simulator should be listing on TCP port 6180 and if you connect to that port using telnet, you should be able to login. 
+
+\begin{lstlisting}
+$> telnet localhost 6180
+
+Trying ::1...
+telnet: connect to address ::1: Connection refused
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+HSLA Port (d.h000,d.h001,d.h002,d.h003,d.h004,d.h005,d.h006,d.h007,d.h008,d.h009,d.h010,d.h011,d.h012,d.h013,d.h014,d.h015,d.h016,d.h017,d.h018,d.h019,d.h020,d.h021,d.h022,d.h023,d.h024,d.h025,d.h026,d.h027,d.h028,d.h029,d.h030,d.h031)? 
+Attached to line d.h000
+
+Multics MR12.6f: Installation and location (Channel d.h000)
+Load = 5.0 out of 90.0 units: users = 5, 04/19/20  0706.0 pst Sun
+\end{lstlisting}
+
+Now you can login as SysAdmin
+
+\begin{lstlisting}
+$> login Repair -cpw    # flag to change password
+
+Password:
+New Password:
+New Password Again:
+
+Your password was given incorrectly at 04/15/20  0706.4 pst Sun from ASCII term
+\cinal "none".      
+# Audit Trial in use, I've put password once incorrectly
+
+Password changed.
+You are protected from preemption.
+Repair.SysAdmin logged in 04/19/20  0706.7 pst Sun from ASCII terminal "none".
+
+New messages in message_of_the_day:
+
+Welcome to the Multics System.
+
+print_motd:  Created >user_dir_dir>SysAdmin>Repair>Repair.value.
+r 07:06 0.208 31
+
+M->         # you can start using Multics
+\end{lstlisting}
+
+With this running Multics you can do:
+
+\begin{itemize}
+    \item Logging into an Existing Account
+    \item Logging in as an Anonymous User
+    \item Creating Directories
+    \item Listing the Contents of Directories
+    \item Entry Names
+    \item Editing files (Emas, qedx, edm, Teco)
+    \item Printing files
+    \item Setting Time Zone
+\end{itemize}
+
+\textbf{Quick overview of these capabilities will be demonstrated during my presentation}.
+
+

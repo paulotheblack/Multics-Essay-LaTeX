@@ -2,60 +2,66 @@
 \section{Significance and Influence of Multics}
 
 As we could read in previous sections, it is clear that Multics was the first system, which considered \textit{security} a 
-\textbf{neccessity}, not an additional feature. Multics was designed to be secure from the begining. This fact is in modern 
-operating systems taken for granted. In the xxxx the system was awarded the B2 security rating by the NCSC, the first 
+\textbf{necessity}, not an additional feature. Multics was designed to be secure from the beginning. This fact is in modern 
+operating systems taken for granted. In the 1985 the system was awarded the B2 security rating by the NCSC, the first 
 (and for years only) system to get a B2 rating.
 
-Multics was written in the \textit{PL/I} language (created by IBM in 1965), only part of the operating system was implemented 
-in \textit{assembly} langugage. Writing operating system in a \textit{high-level} (not in today's standarts) language was a 
-radical idea at the time. In addition to PL/I supports BCPL, BASIC, FORTRAN, LISP, COBOL, ALGOL68 and additionaly C and Pascal. 
+Multics was written in the \textit{PL/I} language (created by IBM in 1964), only part of the operating system was implemented 
+in \textit{assembly} language. Writing operating system in a \textit{high-level} (not in today's standards) language was a 
+radical idea at the time. In addition to PL/I, Multics supports BCPL, BASIC, FORTRAN, LISP, COBOL, ALGOL68 and additionally C and Pascal. 
 
-Multics provided \textit{first commercial relational database} product. The \textit{MRDS}, Multics Relational Data Store.
+Multics provided \textit{first commercial relational database} product. The \textit{MRDS}, Multics Relational Data Store.\cite{mindpride}
 
 All systems in early 70's was designed to be able to run 24/7, but only Multics had capability to add or remove CPUs, memory, 
 I/O controllers and disk drives from system configuration while the system is running.
 
-The most notable influence on other operating system, which we can still see today is in GNU/Linux .based systems.
-Part of it because inventors of \textbf{UNIX} \textit{Ken Thompson} and \textit{Dennis Ritchie}(also inventor of C language), 
+The most notable influence on other operating system, which we can still see today is in GNU/Linux based systems.
+Part of it is because inventors of \textbf{UNIX} \textit{Ken Thompson} and \textit{Dennis Ritchie} (also inventor of C language), 
 worked on Multics until \textit{Bell Labs} dropped out of the Multics development in 1969.
-Ken Thompson was "inspired" by \textit{access control list mechanism}, which was implemented in UNIX and was also one of 
+
+Ken Thompson was "inspired" by \textit{access control list mechanism}, which was implemented in UNIX and was also one of the
 primary security measurements in the system.
+
 The idea of having the \textit{command processing shell} to be an ordinary slave program came from the Multics design, 
-and a predecessor program on \textit{CTSS} by \textit{Louis Pouzin} called \textbf{RUNCOM}.
+and a predecessor program on \textit{CTSS} by \textit{Louis Pouzin} called \textbf{RUNCOM}.\cite{multicians}
 
-The vaule of Multics in UNIX early development ideas could be also seen at the \textit{50th Anniversary} of the Unix creation.
+The value of Multics in UNIX early development ideas could be also seen at the \textit{50th Anniversary} of the Unix creation.
 One of the articles, by \textit{Richard Jensen} is called \textit{Unix at 50: How the OS that powered smartphones started from 
-failure}, which direct reference to Multics. Such articles often say: \textit{"Multics failed. The Bell Labs computer guys then 
-invented their own system, Unix, and Unix succeeded."}. On the other hand, Multics did not fail, it accomplished almost all of 
-its stated goals. Unix succeeded too, solving a different problem.
+failure}, which direct reference to Multics. Such articles often say: 
+\begin{displayquote}
+"Multics failed. The Bell Labs computer guys then invented their own system, Unix, and Unix succeeded.
+\end{displayquote}
+On the other hand, Multics did not fail, it accomplished almost all of its stated goals. Unix succeeded too, solving a different problem.
+\newline \newline
+Next time, when you "ssh-into" your remote server and see greeting such as this:
+\begin{lstlisting}
+    Last login: Fri Apr 17 13:52:12 2020 from 88.212.40.17}
+\end{lstlisting}
+You can think of \textbf{Multiplexed Information and Computing Service}.
 
-Next time, when you "ssh-into" your remote server and see greeting such as this: \newline
-\textit{Last login: Fri Apr 17 13:52:12 2020 from 88.212.40.17} \newline
-You will think of \textbf{Multiplexed Information and Computing Service}.
 
+\begin{displayquote}
+\textit{
+"To what extent should one trust a statement that a program is free of Trojan horses? 
+Perhaps it is more important to trust the people who wrote the software."
+}
+\textbf{Ken Thompson} \cite{thompson}
+\end{displayquote}
 
 \section{Glossary}
-% System designer
-% Access
-% Administator
-% Bottleneck
-% Ring mechanism
-% Descriptor
-% Encryption device
-% Reference Monitor
-% Subverter
-% Gatekeeper
-% Gate segment
-% WWMCCS GCOS
-% IBM OS/360/370
-% Tiger team
-% IDC - Incerement address, Decrement tally, and Continue)
-% ITS (pointer) -
-% RCU - Restore Control Unit (ring 0 instruction)
-% Signaller - Module responsivle for procesing faults (master mode procedure)
-% PDS - Process Data Segment
-% Penetrator - 
-% PL/I - 
-% B2 mark
+\begin{itemize}
+    \item CTSS - The Compatible Time-Sharing System, \href{https://www.youtube.com/watch?v=Q07PhW5sCEk}{IBM 7090 and young prof. Corbato about Timesharing on WGBH-TV (1963)}
+    \item Descriptor - Contents of an SDW.
+    \item Gate - Segment that allows transfer of control between rings in a controlled fashion. Each gate segment has a vector of entries at its start.
+    \item IBM OS\textbackslash 360\textbackslash 370 - Family of mainframe computer system developed by IBM.
+    \item IDC - Incerement address, Decrement tally, and Continue
+    \item PDS - Process Data Segment
+    \item PL\textbackslash I - Programming Language \#1, invented by George Radin of IBM in 1964
+    \item RCU - Restore Control Unit (ring 0 instruction)
+    \item Signaller - Module responsible for processing faults (master mode procedure)
+    \item SDW - Segment Descriptor Word. An element of a process's descriptor segment; the hardware-accessible data element that defines a segment and the process's access rights to it.
+    \item Subverter - Program written by the Project ZARF team.
+    \item WWMCCS GCOS -  The Worldwide Military Command and Control System General Comprehensive Operating Supervisor
+    \item ZARF - Code name for Air Force/MITRE tiger team project that cracked Multics security in 1973.
+\end{itemize}
 
-% Bibliography
